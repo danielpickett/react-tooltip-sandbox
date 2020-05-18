@@ -15,3 +15,7 @@
   border-radius: 0.5rem;
   font-size: inherit;
 }
+.App__button:focus {
+  box-shadow: 0 0 .5rem blueviolet;
+  outline: none;
+}

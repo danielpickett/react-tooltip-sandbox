@@ -5,16 +5,8 @@ import { Portal } from './components/Portal/Portal'
 
 function App() {
   const [tooltipActive, setTooltipActive] = useState(false)
-  const [coords, setCoords] = useState<
-    { left: number; top: number } | undefined
-  >()
-  const mainRef = useRef(null)
   return (
-    <div
-      className="App"
-      ref={mainRef}
-      style={{overflow: 'auto'}}
-    >
+    <div className="App" style={{ overflow: 'auto' }}>
       <p>
         Lorem ipsum, dolor sit amet consectetur adipisicing elit. Velit
         praesentium quod minus similique atque totam laboriosam nemo rem
@@ -33,22 +25,22 @@ function App() {
         className="App__button"
         onClick={(e) => {
           setTooltipActive(!tooltipActive)
-          const rect = e.currentTarget.getBoundingClientRect()
-          setCoords({
-            left: rect.x + rect.width / 2,
-            top: rect.y + window.scrollY,
-          })
         }}
       >
         Show tooltip
       </button>
       {tooltipActive && (
         <Portal>
-          <Tooltip
-            coords={coords}
-            parentRef={mainRef}
-            setClosed={() => setTooltipActive(false)}
-          />
+          <Tooltip>
+            <button
+              className="App__button"
+              onClick={(e) => {
+                setTooltipActive(!tooltipActive)
+              }}
+            >
+              Show tooltip
+            </button>
+          </Tooltip>
         </Portal>
       )}
       <p>

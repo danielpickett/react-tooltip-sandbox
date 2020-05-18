@@ -1,33 +1,16 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, ReactNode } from 'react'
 import './Tooltip.scss'
 
 export const Tooltip = ({
-  coords,
-  parentRef,
-  setClosed
+  children
 }: {
-  coords: { left: number; top: number } | undefined
-  parentRef: React.MutableRefObject<HTMLDivElement | null>
-  setClosed: () => void
+  children: ReactNode
 }) => {
-  console.log('parentRef', parentRef.current)
   
-  useEffect(()=> {
-    const node = parentRef.current
-
-    const handleOnScroll = () => {
-      console.log('it scrolled')
-      setClosed()
-    }
-
-    if (node) node.addEventListener('scroll', handleOnScroll)
-    return ( )=> {
-      if (node) node.removeEventListener('scroll', handleOnScroll)
-    }
-  }, [parentRef, setClosed])
+  
 
   return (
-    <div className="Tooltip" style={{ top: coords?.top, left: coords?.left }}>
+    <div className="Tooltip">
       Hello from the Tooltip component
     </div>
   )
