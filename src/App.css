@@ -4,7 +4,7 @@
   border: 1px solid red;
   margin: 0 auto;
   padding: 1rem;
-  max-height: 595px;
+  height: 595px;
 }
 
 .App__button {
@@ -18,4 +18,8 @@
 .App__button:focus {
   box-shadow: 0 0 .5rem blueviolet;
   outline: none;
+}
+
+.App__wrapper {
+  height: 100%;
 }

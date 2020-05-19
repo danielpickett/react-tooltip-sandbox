@@ -6,10 +6,10 @@ import { Portal } from './components/Portal/Portal'
 function App() {
   const [tooltipIsActive, setTooltipIsActive] = useState(false)
   return (
-    <div className="App" style={{ overflow: 'auto' }}>
-      <div className="App__wrapper-1">
-        <div className="App__wrapper-2">
-          <div className="App__wrapper-3">
+    <div className="App">
+      <div className="App__wrapper App__wrapper-1"  style={{ overflow: 'auto' }}>
+        <div className="App__wrapper App__wrapper-2">
+          <div className="App__wrapper App__wrapper-3">
             <p>
               Lorem ipsum, dolor sit amet consectetur adipisicing elit. Velit
               praesentium quod minus similique atque totam laboriosam nemo rem
