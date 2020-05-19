@@ -5,6 +5,8 @@ import React, {
   cloneElement,
   useEffect,
   ReactNode,
+  useRef,
+  MutableRefObject,
 } from 'react'
 import './Tooltip.scss'
 import { createPortal } from 'react-dom'
@@ -20,19 +22,7 @@ export const Tooltip = ({
   isActive: boolean
   deactivate: () => void
 }) => {
-  const [coords, setCoords] = useState<{ left: number; top: number } | null>()
-  const [triggerNode, setTriggerNode] = useState()
-
-  const callbackRef = useCallback((node) => {
-    if (node !== null) {
-      const rect = node.getBoundingClientRect()
-      setCoords({
-        left: rect.x + rect.width / 2,
-        top: rect.y + window.scrollY,
-      })
-      setTriggerNode(node)
-    }
-  }, [])
+  const triggerRef = useRef(null)
 
   useEffect(() => {
     console.log('it rendered')
@@ -49,32 +39,50 @@ export const Tooltip = ({
     }
 
     if (isActive) {
-      getScrollParent(triggerNode, (node: Node) => {
+      getScrollParent(triggerRef.current, (node: Node) => {
         node.addEventListener('scroll', deactivate)
       })
     } else {
-      getScrollParent(triggerNode, (node: Node) => {
+      getScrollParent(triggerRef.current, (node: Node) => {
         node.removeEventListener('scroll', deactivate)
       })
     }
 
     return () => {
-      getScrollParent(triggerNode, (node: Node) => {
+      getScrollParent(triggerRef.current, (node: Node) => {
         node.removeEventListener('scroll', deactivate)
       })
     }
   })
 
+  const getPos = (node: Element | null) => {
+    if (node == null) {
+      return { left: 0, top: 0 }
+    }
+    const rect = node.getBoundingClientRect()
+    const coords = {
+      left: rect.x + rect.width / 2,
+      top: rect.y - rect.height,
+    }
+
+    return coords
+  }
+
   return (
     <>
-      {cloneElement(trigger, { ref: callbackRef })}
+      {cloneElement(trigger, { ref: triggerRef })}
       {isActive &&
         createPortal(
           <div
             className="Tooltip"
-            style={{ left: coords?.left, top: coords?.top }}
+            style={{
+              left: getPos(triggerRef?.current).left,
+              top: getPos(triggerRef?.current).top,
+            }}
           >
-            {content}
+            <div className="Tooltip__content">
+              {content}
+            </div>
           </div>,
           document.body
         )}
