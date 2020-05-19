@@ -1,12 +1,9 @@
 import React, {
   ReactElement,
-  useCallback,
-  useState,
   cloneElement,
   useEffect,
   ReactNode,
   useRef,
-  MutableRefObject,
 } from 'react'
 import './Tooltip.scss'
 import { createPortal } from 'react-dom'
