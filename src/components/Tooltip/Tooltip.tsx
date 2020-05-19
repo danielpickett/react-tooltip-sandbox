@@ -10,11 +10,6 @@ export const Tooltip = ({
   children: ReactElement
   isActive: boolean
 }) => {
-  if (ReactIs.isFragment(children))
-    throw new Error(
-      'Tooltip component must have only one child that is not a React.Fragment'
-    )
-
   const [coords, setCoords] = useState<{ left: number; top: number } | null>()
 
   const callbackRef = useCallback((node) => {
@@ -31,10 +26,7 @@ export const Tooltip = ({
 
   return (
     <>
-      <div className="Tooltip__container">
-        {cloneElement(children, { ref: callbackRef })}
-        {/* {children} */}
-      </div>
+      {cloneElement(children, { ref: callbackRef })}
 
       {isActive && (
         <Portal>
