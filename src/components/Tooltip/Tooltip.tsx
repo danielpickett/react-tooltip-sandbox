@@ -1,15 +1,24 @@
-import React, { ReactElement, useCallback, useState, cloneElement, useEffect } from 'react'
+import React, {
+  ReactElement,
+  useCallback,
+  useState,
+  cloneElement,
+  useEffect,
+  ReactNode,
+} from 'react'
 import './Tooltip.scss'
-import { Portal } from '../Portal/Portal'
-import * as ReactIs from 'react-is'
 import { createPortal } from 'react-dom'
 
 export const Tooltip = ({
-  children,
+  trigger,
+  content,
   isActive,
+  deactivate,
 }: {
-  children: ReactElement
+  trigger: ReactElement
+  content: ReactNode
   isActive: boolean
+  deactivate: () => void
 }) => {
   const [coords, setCoords] = useState<{ left: number; top: number } | null>()
   const [triggerNode, setTriggerNode] = useState()
@@ -25,41 +34,47 @@ export const Tooltip = ({
     }
   }, [])
 
-  useEffect(()=> {
-    
+  useEffect(() => {
+    console.log('it rendered')
+
     const getScrollParent = (
-      node: (Node & ParentNode) | null | undefined
+      node: (Node & ParentNode) | null | undefined,
+      callback: (node: Node) => void
     ): (Node & ParentNode) | null => {
       if (!node) {
         return null
       }
-  
-      if (
-        (node as HTMLElement).scrollHeight > (node as HTMLElement).clientHeight
-      ) {
-        return node
-      } else {
-        return getScrollParent(node.parentNode)
-      }
+      callback(node)
+      return getScrollParent(node.parentNode, callback)
     }
 
-    if (isActive && triggerNode) {
-      console.log(getScrollParent(triggerNode))
+    if (isActive) {
+      getScrollParent(triggerNode, (node: Node) => {
+        node.addEventListener('scroll', deactivate)
+      })
+    } else {
+      getScrollParent(triggerNode, (node: Node) => {
+        node.removeEventListener('scroll', deactivate)
+      })
+    }
+
+    return () => {
+      getScrollParent(triggerNode, (node: Node) => {
+        node.removeEventListener('scroll', deactivate)
+      })
     }
   })
 
-  
-
   return (
     <>
-      {cloneElement(children, { ref: callbackRef })}
+      {cloneElement(trigger, { ref: callbackRef })}
       {isActive &&
         createPortal(
           <div
             className="Tooltip"
             style={{ left: coords?.left, top: coords?.top }}
           >
-            Hello from the Tooltip component
+            {content}
           </div>,
           document.body
         )}

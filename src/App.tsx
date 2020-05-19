@@ -1,15 +1,17 @@
-import React, { useState, useRef } from 'react'
+import React, { useState } from 'react'
 import './App.css'
 import { Tooltip } from './components/Tooltip/Tooltip'
-import { Portal } from './components/Portal/Portal'
 
 function App() {
   const [tooltipIsActive, setTooltipIsActive] = useState(false)
   return (
     <div className="App">
-      <div className="App__wrapper App__wrapper-1"  style={{ overflow: 'auto' }}>
+      <div className="App__wrapper App__wrapper-1">
         <div className="App__wrapper App__wrapper-2">
-          <div className="App__wrapper App__wrapper-3">
+          <div
+            className="App__wrapper App__wrapper-3"
+            style={{ overflow: 'auto' }}
+          >
             <p>
               Lorem ipsum, dolor sit amet consectetur adipisicing elit. Velit
               praesentium quod minus similique atque totam laboriosam nemo rem
@@ -25,16 +27,22 @@ function App() {
               quibusdam quis quisquam aliquid in atque deleniti, hic, ab optio
               laborum tempora?
             </p>
-            <Tooltip isActive={tooltipIsActive}>
-              <button
-                className="App__button"
-                onClick={(e) => {
-                  setTooltipIsActive(!tooltipIsActive)
-                }}
-              >
-                Show tooltip
-              </button>
-            </Tooltip>
+            <Tooltip
+              isActive={tooltipIsActive}
+              deactivate={() => setTooltipIsActive(false)}
+              trigger={
+                <button
+                  className="App__button"
+                  onClick={(e) => {
+                    setTooltipIsActive(!tooltipIsActive)
+                  }}
+                >
+                  Show tooltip
+                </button>
+              }
+              content={<div>hello</div>}
+            />
+
             <p>
               Lorem ipsum, dolor sit amet consectetur adipisicing elit. Velit
               praesentium quod minus similique atque totam laboriosam nemo rem
