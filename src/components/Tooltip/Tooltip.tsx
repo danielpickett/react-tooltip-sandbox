@@ -4,6 +4,8 @@ import React, {
   useEffect,
   ReactNode,
   useRef,
+  useCallback,
+  useState,
 } from 'react'
 import './Tooltip.scss'
 import { createPortal } from 'react-dom'
@@ -19,50 +21,32 @@ export const Tooltip = ({
   isActive: boolean
   deactivate: () => void
 }) => {
-  const triggerRef = useRef(null)
-
-  useEffect(() => {
-    console.log('it rendered')
-
-    const getScrollParent = (
-      node: (Node & ParentNode) | null | undefined,
-      callback: (node: Node) => void
-    ): (Node & ParentNode) | null => {
-      if (!node) {
-        return null
-      }
-      callback(node)
-      return getScrollParent(node.parentNode, callback)
+  const [tooltipRect, setTooltipRect] = useState<DOMRect>()
+  const tooltipRef = useCallback((node) => {
+    if (node !== null) {
+      setTooltipRect(node.getBoundingClientRect())
     }
+  }, [])
 
-    if (isActive) {
-      getScrollParent(triggerRef.current, (node: Node) => {
-        node.addEventListener('scroll', deactivate)
-      })
-    } else {
-      getScrollParent(triggerRef.current, (node: Node) => {
-        node.removeEventListener('scroll', deactivate)
-      })
+  const [triggerRect, setTriggerRect] = useState<DOMRect>()
+  const triggerRef = useCallback((node) => {
+    if (node !== null) {
+      setTriggerRect(node.getBoundingClientRect())
     }
+  }, [])
 
-    return () => {
-      getScrollParent(triggerRef.current, (node: Node) => {
-        node.removeEventListener('scroll', deactivate)
-      })
+  const getTooltipPos = (
+    _tooltipRect: DOMRect | undefined,
+    _triggerRect: DOMRect | undefined
+  ) => {
+    if (_tooltipRect == undefined || _triggerRect == undefined) {
+      return undefined
     }
-  })
-
-  const getPos = (node: Element | null) => {
-    if (node == null) {
-      return { left: 0, top: 0 }
+    return {
+      left: _triggerRect.x + _triggerRect.width / 2 - _tooltipRect.width / 2,
+      top: _triggerRect.y - _tooltipRect.height
     }
-    const rect = node.getBoundingClientRect()
-    const coords = {
-      left: rect.x + rect.width / 2,
-      top: rect.y - rect.height,
-    }
-
-    return coords
+    
   }
 
   return (
@@ -71,14 +55,15 @@ export const Tooltip = ({
       {isActive &&
         createPortal(
           <div
+            ref={tooltipRef}
             className="Tooltip"
             style={{
-              left: getPos(triggerRef?.current).left,
-              top: getPos(triggerRef?.current).top,
+              left: getTooltipPos(tooltipRect, triggerRect)?.left,
+              top: getTooltipPos(tooltipRect, triggerRect)?.top,
             }}
           >
             <div className="Tooltip__content">
-              {content}
+              <div>{content}</div>
             </div>
           </div>,
           document.body
@@ -86,3 +71,5 @@ export const Tooltip = ({
     </>
   )
 }
+
+//DOMRect {x: 357, y: 283, width: 378.640625, height: 34, top: 283, …}

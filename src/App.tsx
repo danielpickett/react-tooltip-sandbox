@@ -33,7 +33,7 @@ function App() {
             Show tooltip
           </button>
         }
-        content={<div>hello</div>}
+        content={'hello'}
       />
 
       <p>
