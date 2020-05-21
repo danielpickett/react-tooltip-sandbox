@@ -21,32 +21,76 @@ export const Tooltip = ({
   isActive: boolean
   deactivate: () => void
 }) => {
-  const [tooltipRect, setTooltipRect] = useState<DOMRect>()
+  const [tooltipElement, setTooltipElement] = useState<Element>()
   const tooltipRef = useCallback((node) => {
     if (node !== null) {
-      setTooltipRect(node.getBoundingClientRect())
+      setTooltipElement(node)
     }
   }, [])
 
-  const [triggerRect, setTriggerRect] = useState<DOMRect>()
+  const [triggerElement, setTriggerElement] = useState<Element>()
   const triggerRef = useCallback((node) => {
     if (node !== null) {
-      setTriggerRect(node.getBoundingClientRect())
+      setTriggerElement(node)
     }
   }, [])
 
+  useEffect(() => {
+    if (triggerElement?.getBoundingClientRect)
+      console.log('trigger', triggerElement?.getBoundingClientRect())
+    if (tooltipElement?.getBoundingClientRect)
+      console.log('tooltip', tooltipElement?.getBoundingClientRect())
+  })
+
+  // useEffect for attaching scroll listeners to all parents
+  useEffect(() => {
+    const getScrollParent = (
+      node: (Node & ParentNode) | null | undefined,
+      callback: (node: Node) => void,
+    ): (Node & ParentNode) | null => {
+      if (!node) {
+        return null
+      }
+      callback(node)
+      return getScrollParent(node.parentNode, callback)
+    }
+
+    if (isActive) {
+      getScrollParent(triggerElement, (node: Node) => {
+        node.addEventListener('scroll', deactivate)
+      })
+    } else {
+      getScrollParent(triggerElement, (node: Node) => {
+        node.removeEventListener('scroll', deactivate)
+      })
+    }
+
+    return () => {
+      getScrollParent(triggerElement, (node: Node) => {
+        node.removeEventListener('scroll', deactivate)
+      })
+    }
+  })
+
   const getTooltipPos = (
-    _tooltipRect: DOMRect | undefined,
-    _triggerRect: DOMRect | undefined
+    _tooltipElement: Element | undefined,
+    _triggerElement: Element | undefined
   ) => {
-    if (_tooltipRect == undefined || _triggerRect == undefined) {
+    if (
+      _tooltipElement?.getBoundingClientRect == undefined ||
+      _triggerElement?.getBoundingClientRect == undefined
+    ) {
       return undefined
     }
     return {
-      left: _triggerRect.x + _triggerRect.width / 2 - _tooltipRect.width / 2,
-      top: _triggerRect.y - _tooltipRect.height
+      left:
+        _triggerElement?.getBoundingClientRect().x +
+        _triggerElement?.getBoundingClientRect().width / 2 -
+        _tooltipElement?.getBoundingClientRect().width / 2,
+      top:
+        _triggerElement?.getBoundingClientRect().y -
+        _tooltipElement?.getBoundingClientRect().height,
     }
-    
   }
 
   return (
@@ -58,8 +102,8 @@ export const Tooltip = ({
             ref={tooltipRef}
             className="Tooltip"
             style={{
-              left: getTooltipPos(tooltipRect, triggerRect)?.left,
-              top: getTooltipPos(tooltipRect, triggerRect)?.top,
+              left: getTooltipPos(tooltipElement, triggerElement)?.left,
+              top: getTooltipPos(tooltipElement, triggerElement)?.top,
             }}
           >
             <div className="Tooltip__content">
